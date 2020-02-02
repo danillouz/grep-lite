@@ -1,3 +1,7 @@
+extern crate regex;
+
+use regex::Regex;
+
 /// Search text for a pattern.
 /// Based on this grep specification: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/grep.html
 fn main() {
@@ -5,22 +9,25 @@ fn main() {
 is fundamentally about empowerment: no matter what kind of code you are
 writing now, Rust empowers you to reach farther, to program with confidence
 in a wider variety of domains than you did before.";
-    let query = "Rust";
+    let re = Regex::new("Rust").unwrap();
     let ctx_lines = 2;
     let mut tags: Vec<usize> = Vec::new();
     let mut ctx: Vec<Vec<(usize, String)>> = Vec::new();
 
     for (i, line) in quote.lines().enumerate() {
-        if line.contains(query) {
-            tags.push(i);
+        match re.find(line) {
+            Some(_) => {
+                tags.push(i);
 
-            let v = Vec::with_capacity(2 * ctx_lines + 1);
-            ctx.push(v);
+                let v = Vec::with_capacity(2 * ctx_lines + 1);
+                ctx.push(v);
+            }
+            None => (),
         }
     }
 
     if tags.len() == 0 {
-        println!("No match for pattern: \"{}\"", query);
+        println!("No match for pattern: \"{:?}\"", re);
         return;
     }
 
